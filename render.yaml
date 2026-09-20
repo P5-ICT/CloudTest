@@ -1,0 +1,31 @@
+# Render Blueprint — https://render.com/docs/blueprint-spec
+# In the Render dashboard: New → Blueprint → point at this repo, and Render
+# will create both services below. You still need to fill in DATABASE_URL
+# and FRONTEND_ORIGIN yourself (marked sync: false) after the first deploy,
+# since they depend on values Render/Supabase only generate once things exist.
+services:
+  - type: web
+    name: pillar5-cloud-test-api
+    runtime: python
+    rootDir: backend
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: ADMIN_PASSCODE
+        sync: false
+      - key: FRONTEND_ORIGIN
+        sync: false
+
+  - type: web
+    name: pillar5-cloud-test-web
+    runtime: node
+    rootDir: frontend
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        sync: false

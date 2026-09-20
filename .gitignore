@@ -1,0 +1,14 @@
+# frontend
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/.env
+frontend/.env.local
+
+# backend
+backend/__pycache__/
+backend/.env
+backend/venv/
+backend/.venv/
+
+.DS_Store
