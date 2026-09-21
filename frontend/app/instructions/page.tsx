@@ -26,6 +26,7 @@ export default function InstructionsPage() {
     setStarting(true);
     setError(null);
     try {
+      await document.documentElement.requestFullscreen?.()?.catch(() => {});
       const attempt = await createAttempt(firstName, lastName);
       localStorage.setItem(`attempt:${attempt.id}`, JSON.stringify(attempt));
       localStorage.setItem('lastAttemptId', attempt.id);

@@ -31,6 +31,27 @@ export default function TestPage({ params }: { params: { id: string } }) {
   const warnedTwo = useRef(false);
   const finishing = useRef(false);
 
+  // trap the back/forward buttons — once the test has started, leaving via
+  // browser navigation just re-lands back on this same page
+  useEffect(() => {
+    window.history.pushState(null, '', window.location.href);
+    const onPopState = () => {
+      window.history.pushState(null, '', window.location.href);
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
+
+  // warn on accidental tab close/refresh mid-test
+  useEffect(() => {
+    const onBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = '';
+    };
+    window.addEventListener('beforeunload', onBeforeUnload);
+    return () => window.removeEventListener('beforeunload', onBeforeUnload);
+  }, []);
+
   // load attempt (cache-first, then refresh from server)
   useEffect(() => {
     const cached = localStorage.getItem(`attempt:${id}`);
@@ -69,6 +90,9 @@ export default function TestPage({ params }: { params: { id: string } }) {
       try {
         await submitAttempt(id);
         localStorage.removeItem(`attempt:${id}`);
+        if (document.fullscreenElement) {
+          await document.exitFullscreen().catch(() => {});
+        }
         router.push(`/results/${id}${auto ? '?auto=1' : ''}`);
       } catch (e) {
         finishing.current = false;
