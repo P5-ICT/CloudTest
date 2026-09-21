@@ -317,6 +317,8 @@ async def admin_attempt_detail(attempt_id: str, _: bool = Depends(check_admin)):
         t["total"] += 1
         if d["correct"]:
             t["correct"] += 1
+    for t in topic_stats.values():
+        t["pct"] = round(t["correct"] / t["total"] * 1000) / 10 if t["total"] else 0
     return {
         "first_name": row["first_name"],
         "last_name": row["last_name"],
