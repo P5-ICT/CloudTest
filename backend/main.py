@@ -47,7 +47,9 @@ pool: Optional[asyncpg.Pool] = None
 @app.on_event("startup")
 async def on_startup():
     global pool
-    pool = await asyncpg.create_pool(DATABASE_URL, min_size=1, max_size=5)
+    # statement_cache_size=0: Supabase's transaction pooler (pgbouncer) doesn't
+    # support prepared statements, which asyncpg uses by default.
+    pool = await asyncpg.create_pool(DATABASE_URL, min_size=1, max_size=5, statement_cache_size=0)
 
 
 @app.on_event("shutdown")
